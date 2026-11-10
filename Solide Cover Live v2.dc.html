@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="/support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-cvroot="1" style="position:relative;width:100%;aspect-ratio:1450/1000">
+<div style="position:absolute;left:{{ ox }}px;top:{{ oy }}px;width:1450px;height:1000px;zoom:{{ sc }}">
+<img src="assets/sd01-tokens-window.webp" alt="Solide token screen" style="position:absolute;left:330px;top:0;width:1120px;height:700px;border-radius:14px;box-shadow:0 0 0 1px rgba(207,224,255,.3),0 24px 70px rgba(0,0,0,.6)">
+<div style="position:absolute;left:0;top:160px;width:1344px;height:840px;border-radius:16px;overflow:hidden;box-shadow:0 0 0 1px rgba(207,224,255,.35),0 0 0 6px rgba(143,180,255,.06),0 30px 80px rgba(0,0,0,.65);background:#e5e5e5">
+<div style="position:absolute;left:0;top:0;width:1440px;height:900px;zoom:.93333"><dc-import name="Solide Story Canvas" only="3d" story="{{ story }}" hint-size="1440px,900px"></dc-import></div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sc: 0.6, story: null };
+  setRoot = (el) => { this.root = el; };
+  snap(t) {
+    const REP = 4900, INC = 5900, SP = 6800, CLR = 8700;
+    const on = (a, b) => t >= a && t < b;
+    const ring = (a) => { if (!on(a, CLR)) return false; const d = t - a; return d >= 900 || Math.floor(d / 150) % 2 === 0; };
+    return { rows: { bars: ring(REP), inc: ring(INC), sp: ring(SP) }, logRing: { rep: ring(REP), inc: ring(INC), sp: ring(SP) }, log: { rep: t >= REP, inc: t >= INC, sp: t >= SP, ver: t >= 8400 }, panel: ring(REP), card: on(REP, CLR), busy: on(REP, CLR), dotOn: Math.floor(t / 400) % 2 === 0, bars: t < REP, swap: t >= 5600, inc: t >= INC, sp: t >= SP, dots: t >= 7700, tip: !on(REP, 7900) };
+  }
+  componentDidMount() {
+    this.rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.fit = () => { if (this.root && this.root.clientWidth) this.setState({ sc: this.root.clientWidth / 1450, w: this.root.clientWidth }); };
+    let n = 0; const wait = () => { const all = [...document.querySelectorAll('[data-cvroot]')]; this.root = all.find((e) => !e.__cvo) || this.root; if (this.root) { this.root.__cvo = 1; this.fit(); if (window.ResizeObserver) { this.ro = new ResizeObserver(this.fit); this.ro.observe(this.root); } } else if (n++ < 200) setTimeout(wait, 50); };
+    wait();
+    if (this.rm) { this.setState({ story: this.snap(9500) }); return; }
+    const LOOP = 9800, HOLD = 700; let t0 = performance.now(), last = '', lastVis = 0, vis = true;
+    this.tick = setInterval(() => {
+      const now = performance.now();
+      if (now - lastVis > 300) { lastVis = now; const cv = this.root && this.root.closest('[data-cover]'); vis = (!cv || +getComputedStyle(cv).opacity > 0.02); if (!vis) { t0 = now - (this.tl || 0); } }
+      if (!vis) return;
+      const t = (now - t0) % (LOOP + HOLD); this.tl = t;
+      this.build(t); const bt = Math.min(t, LOOP), s = bt < 4200 ? Object.assign(this.snap(0), { busy: true, dotOn: Math.floor(bt / 400) % 2 === 0 }) : this.snap(bt + 700), k = JSON.stringify(s);
+      if (k !== last) { last = k; this.setState({ story: s }); }
+    }, 60);
+  }
+  build(t) {
+    if (!this.root) return;
+    if (!this.bl) {
+      const dash = [...this.root.querySelectorAll('div')].find((d) => d.style.width === '880px' && d.style.height === '700px'); if (!dash) return; const main = dash.children[1]; if (!main) return;
+      const deep = []; [dash.children[0]].concat([...main.children]).forEach((p) => { if (p.children.length > 1 && getComputedStyle(p).display === 'grid') deep.push(...p.children); else deep.push(p); });
+      const rows = [...this.root.querySelectorAll('div')].filter((d) => d.style.position === 'absolute' && d.style.left === '8px' && d.style.right === '8px' && d.style.height === '24px');
+      if (!rows.length) return;
+      this.guides = [...this.root.querySelectorAll('span')].filter((e) => e.style.position === 'absolute' && e.style.width === '1px' && e.style.zIndex === '1');
+      const prep = (e) => { e.style.transition = 'opacity 320ms ease,transform 460ms cubic-bezier(.2,.8,.2,1),outline-color 300ms ease'; e.style.outline = '2px solid rgba(249,115,22,0)'; e.style.outlineOffset = '1px'; };
+      deep.forEach(prep); rows.forEach(prep); this.guides.forEach((e) => { e.style.transition = 'opacity 400ms ease'; });
+      this.bl = deep; this.rows = rows;
+    }
+    const B0 = 300, B1 = 3900, RING = 520, set = (e, at, dy) => { const on = t >= at, hot = on && t < at + RING, k = (on ? 1 : 0) + (hot ? 2 : 0); if (e.__k === k) return; e.__k = k; e.style.opacity = on ? '' : '0'; e.style.transform = on ? '' : dy; e.style.outlineColor = hot ? 'rgba(249,115,22,.9)' : 'rgba(249,115,22,0)'; };
+    const nr = this.rows.length, nbk = this.bl.length;
+    this.rows.forEach((e, i) => set(e, B0 + i * (B1 - B0) / nr, 'translateX(-8px)'));
+    this.bl.forEach((e, i) => set(e, B0 + 120 + i * (B1 - B0) / nbk, 'translateY(10px) scale(.97)'));
+    const gOn = t >= B1; if (this.gOn !== gOn) { this.gOn = gOn; this.guides.forEach((e) => { e.style.opacity = gOn ? '' : '0'; }); }
+  }
+  componentWillUnmount() { clearInterval(this.tick); if (this.ro) this.ro.disconnect(); }
+  renderVals() { const k = 1; return { setRoot: this.setRoot, ox: 0, oy: 0, sc: this.state.sc * k, story: this.state.story || this.snap(0) }; }
+}
+</script>
+</body>
+</html>
