@@ -18,6 +18,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/vendor/react.production.min.js" as="script" crossorigin="anonymous" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z">
+<link rel="preload" href="/vendor/react-dom.production.min.js" as="script" crossorigin="anonymous" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <script src="/site.js" defer></script>
 <script src="/support.js"></script>
@@ -648,10 +650,10 @@ class Component extends DCLogic {
     const pick = () => { if (mx < -999) { tg = null; return; } const el = document.elementFromPoint(mx, my); tg = el && el.closest(TG); dark = !!(el && el.closest(DK)); };
     const frame = (now) => {
       raf = 0; if (document.hidden) return;
-      const on = mx > -999; if (on && cx < -999) { cx = mx; cy = my; } if (on) { cx += (mx - cx) * (rm ? 1 : 0.22); cy += (my - cy) * (rm ? 1 : 0.22); }
+      const on = mx > -999; if (on && cx < -999) { cx = mx; cy = my; } if (on) { cx = mx; cy = my; }
       const big = !!(tg && tg.getAttribute('data-cur') === 'case'), sz = big ? 64 : 28, col = dark ? '#cfe0ff' : '#2563eb';
-      dot.style.opacity = on ? 1 : 0; dot.style.transform = 'translate(' + mx + 'px,' + my + 'px)'; dot.style.boxShadow = '0 0 0 1.5px ' + col;
-      ring.style.opacity = on ? 1 : 0; ring.style.color = col; ring.style.width = sz + 'px'; ring.style.height = sz + 'px'; ring.style.margin = (-sz / 2) + 'px 0 0 ' + (-sz / 2) + 'px'; ring.style.background = big ? (dark ? 'rgba(143,180,255,.12)' : 'rgba(37,99,235,.10)') : 'transparent'; ring.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
+      dot.style.opacity = on ? 1 : 0; dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)'; dot.style.boxShadow = '0 0 0 1.5px ' + col;
+      ring.style.opacity = on ? 1 : 0; ring.style.color = col; ring.style.width = sz + 'px'; ring.style.height = sz + 'px'; ring.style.margin = (-sz / 2) + 'px 0 0 ' + (-sz / 2) + 'px'; ring.style.background = big ? (dark ? 'rgba(143,180,255,.12)' : 'rgba(37,99,235,.10)') : 'transparent'; ring.style.transform = 'translate3d(' + cx + 'px,' + cy + 'px,0)';
       if (orb) orb.style.transform = rm ? 'none' : 'rotate(' + (now * 0.2) + 'deg)';
       if (inn) { const isz = Math.round(sz * 0.44); inn.style.width = isz + 'px'; inn.style.height = isz + 'px'; inn.style.margin = (-isz / 2) + 'px 0 0 ' + (-isz / 2) + 'px'; inn.style.opacity = tg && !big ? (down ? 0.7 : 0.38) : 0; inn.style.transform = 'scale(' + (down ? 0.5 : 1) + ')'; }
       if (lab) { const txt = big ? tg.getAttribute('data-clabel') : ''; lab.style.opacity = on && txt ? 1 : 0; if (txt) { if (lab.textContent !== txt) { lab.textContent = txt; lw = 0; } lab.style.background = dark ? '#eaf1ff' : '#0b1226'; lab.style.color = dark ? '#0b1226' : '#ffffff'; const w = lw || (lw = lab.offsetWidth); let x = mx + 22; if (x + w > window.innerWidth - 8) x = mx - w - 22; lab.style.transform = 'translate(' + x + 'px,' + (my + 24) + 'px)'; } }
@@ -659,7 +661,7 @@ class Component extends DCLogic {
       if (on || (ring.style.opacity !== '0')) raf = requestAnimationFrame(frame);
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
-    this._cm = (e) => { mx = e.clientX; my = e.clientY; pick(); kick(); };
+    this._cm = (e) => { mx = e.clientX; my = e.clientY; dot.style.transform = ring.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)'; pick(); kick(); };
     this._cs = () => { pick(); kick(); };
     this._cd = () => { down = true; kick(); }; this._cu = () => { down = false; };
     this._cl = () => { mx = -9999; my = -9999; cx = -9999; tg = null; kick(); };
