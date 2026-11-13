@@ -38,7 +38,7 @@
     ring.style.opacity = on ? 1 : 0; ring.style.color = col; ring.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
     orb.style.transform = rm ? 'none' : 'rotate(' + (now * 0.2) + 'deg)';
     inn.style.opacity = tg ? (down ? 0.7 : 0.38) : 0; inn.style.transform = 'scale(' + (down ? 0.5 : 1) + ')';
-    if (on && tg && !tg.hasAttribute('data-nobrk') && !tg.closest('[data-nvb],[data-brkpad]')) {
+    if (on && tg && !tg.hasAttribute('data-nobrk') && !tg.closest('[data-nvb],[data-brkpad]') && tg.closest('aside,[data-side],[data-r="rail"],[data-r="drawer"],[data-r="bar"]')) {
       var r = tg.getBoundingClientRect(), pd = 6, W = innerWidth, H = innerHeight, bw = r.width + pd * 2, bh = r.height + pd * 2;
       if (r.width < W * 0.9 && r.height < H * 0.6 && r.width > 0) {
         var ob = Math.min(tg.__br !== undefined ? tg.__br : (tg.__br = parseFloat(getComputedStyle(tg).borderTopLeftRadius) || 0), r.height / 2, r.width / 2), rad = Math.min(ob + pd, bw / 2, bh / 2), SZ = Math.min(Math.max(12, rad + 4), bw, bh);
