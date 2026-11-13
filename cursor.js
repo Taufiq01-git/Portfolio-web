@@ -6,7 +6,7 @@
   var css = document.createElement('style');
   css.textContent = 'html[data-cur-on],html[data-cur-on] *{cursor:none!important}';
   document.head.appendChild(css);
-  var Z = 2147483000, B = '#2563eb', L = '#cfe0ff';
+  var Z = 2147483000, th = (document.currentScript && document.currentScript.getAttribute('data-theme')) || (/tasmi/.test(location.pathname) ? 'tasmi' : /solide/.test(location.pathname) ? 'solide' : ''), TH = { tasmi: ['#3F7A55', '#9fd3ae'], solide: ['#ea580c', '#fdba74'] }[th] || ['#2563eb', '#cfe0ff'], B = TH[0], L = TH[1];
   function mk(html) { var d = document.createElement('div'); d.setAttribute('aria-hidden', 'true'); d.innerHTML = html; return d.firstChild; }
   var brk = mk('<div style="position:fixed;left:0;top:0;width:0;height:0;z-index:' + (Z - 2) + ';pointer-events:none;opacity:0;color:' + B + ';transform:translate(-200px,-200px);transition:transform .38s cubic-bezier(.2,.8,.2,1),width .38s cubic-bezier(.2,.8,.2,1),height .38s cubic-bezier(.2,.8,.2,1),opacity .25s,color .38s"><span style="position:absolute;left:0;top:0;width:12px;height:12px;border-left:2px solid currentColor;border-top:2px solid currentColor"></span><span style="position:absolute;right:0;top:0;width:12px;height:12px;border-right:2px solid currentColor;border-top:2px solid currentColor"></span><span style="position:absolute;left:0;bottom:0;width:12px;height:12px;border-left:2px solid currentColor;border-bottom:2px solid currentColor"></span><span style="position:absolute;right:0;bottom:0;width:12px;height:12px;border-right:2px solid currentColor;border-bottom:2px solid currentColor"></span></div>');
   var dot = mk('<div style="position:fixed;left:0;top:0;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#fff;box-shadow:0 0 0 1.5px ' + B + ';z-index:' + Z + ';pointer-events:none;opacity:0;will-change:transform"></div>');
@@ -38,11 +38,17 @@
     ring.style.opacity = on ? 1 : 0; ring.style.color = col; ring.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
     orb.style.transform = rm ? 'none' : 'rotate(' + (now * 0.2) + 'deg)';
     inn.style.opacity = tg ? (down ? 0.7 : 0.38) : 0; inn.style.transform = 'scale(' + (down ? 0.5 : 1) + ')';
-    if (on && tg && !tg.hasAttribute('data-nobrk')) {
-      var r = tg.getBoundingClientRect(), pd = 5, W = innerWidth, H = innerHeight;
-      var l = Math.max(2, r.left - pd), t = Math.max(2, r.top - pd), rr = Math.min(W - 2, r.right + pd), bb = Math.min(H - 2, r.bottom + pd);
-      if (r.width < W * 0.9 && r.height < H * 0.6 && rr > l && bb > t) { brk.style.color = col; brk.style.transform = 'translate(' + l + 'px,' + t + 'px)'; brk.style.width = (rr - l) + 'px'; brk.style.height = (bb - t) + 'px'; brk.style.opacity = 1; }
-      else brk.style.opacity = 0;
+    if (on && tg && !tg.hasAttribute('data-nobrk') && !tg.closest('[data-nvb],[data-brkpad]')) {
+      var r = tg.getBoundingClientRect(), pd = 6, W = innerWidth, H = innerHeight, bw = r.width + pd * 2, bh = r.height + pd * 2;
+      if (r.width < W * 0.9 && r.height < H * 0.6 && r.width > 0) {
+        var ob = Math.min(tg.__br !== undefined ? tg.__br : (tg.__br = parseFloat(getComputedStyle(tg).borderTopLeftRadius) || 0), r.height / 2, r.width / 2), rad = Math.min(ob + pd, bw / 2, bh / 2), SZ = Math.min(Math.max(12, rad + 4), bw, bh);
+        if (brk.__s !== rad + '|' + SZ) {
+          brk.__s = rad + '|' + SZ;
+          var RR = ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius'];
+          for (var k = 0; k < 4; k++) { var e = brk.children[k]; e.style.transition = 'width .38s cubic-bezier(.2,.8,.2,1),height .38s cubic-bezier(.2,.8,.2,1),border-radius .38s cubic-bezier(.2,.8,.2,1)'; e.style.boxSizing = 'border-box'; e.style.width = e.style.height = SZ + 'px'; for (var q = 0; q < 4; q++) e.style[RR[q]] = q === k ? rad + 'px' : '0'; }
+        }
+        brk.style.color = col; brk.style.transform = 'translate(' + (r.left - pd) + 'px,' + (r.top - pd) + 'px)'; brk.style.width = bw + 'px'; brk.style.height = bh + 'px'; brk.style.opacity = 1;
+      } else brk.style.opacity = 0;
     } else brk.style.opacity = 0;
     if (on) raf = requestAnimationFrame(frame);
   }

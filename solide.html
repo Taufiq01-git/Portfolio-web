@@ -349,7 +349,7 @@ class Component extends DCLogic {
   bkGeom(tg) { const r = tg.getBoundingClientRect(), tag = tg.getAttribute('data-tgt') || '', isLk = tag.indexOf('CHANNEL') === 0 || tag.indexOf('GITHUB') === 0, isNav = tg.tagName === 'BUTTON' && tg.hasAttribute('data-brkpad'), isCard = tg.getAttribute('data-lg') === 'card', act = tg.getAttribute('data-brkpad') === '11';
     const pp = (isLk ? '6' : isCard ? '8' : isNav ? (act ? '6' : '0') : (tg.getAttribute('data-brkpad') || '6')).split(',').map(Number), px = pp[0], py = pp.length > 1 ? pp[1] : pp[0];
     const ob = Math.min(parseFloat(getComputedStyle(tg).borderTopLeftRadius) || 0, r.height / 2, r.width / 2), rad = isLk ? 16 : isCard ? 24 : isNav ? (act ? 12 : 6) : ob + Math.min(px, py), S = isLk ? rad + 6 : isCard ? rad + 8 : isNav ? rad + (act ? 6 : 4) : Math.max(12, rad + 4);
-    return { l: r.left - px, t: r.top - py, w: r.width + 2 * px, h: r.height + 2 * py, S, rad, bw: 2, col: tg.getAttribute('data-brkcol') || (tg.closest('[data-dark]') ? '#cfe0ff' : '#2563eb') }; }
+    return { l: r.left - px, t: r.top - py, w: r.width + 2 * px, h: r.height + 2 * py, S, rad, bw: 2, col: tg.getAttribute('data-brkcol') || (tg.closest('[data-dark]') ? '#fdba74' : '#ea580c') }; }
   bkInit() { if (this.bkOn || !this.root || (window.matchMedia && !matchMedia('(hover: hover) and (pointer: fine)').matches)) return; this.bkOn = 1;
     const tm = (k, v) => { const e = this.root && this.root.querySelector('[data-tm="' + k + '"]'); if (e) e.textContent = v; };
     const show = (tg) => { const b = this.brk; if (!b) return; const fresh = this.tg !== tg; this.tg = tg; const g = this.bkGeom(tg);
@@ -850,6 +850,6 @@ class Component extends DCLogic {
   }
 }
 </script>
-<script src="/cursor.js" defer></script>
+<script src="/cursor.js" data-theme="solide" defer></script>
 </body>
 </html>
